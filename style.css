@@ -3,6 +3,7 @@
     --secondary: #4cc9f0;
     --success: #2ecc71;
     --danger: #e74c3c;
+    --warning: #f39c12;
     --bg: #f8f9fa;
     --surface: #ffffff;
     --text: #2b2d42;
@@ -57,7 +58,9 @@ button:hover { opacity: 0.8; }
 .btn-secondary { background-color: var(--secondary); color: white; }
 .btn-success { background-color: var(--success); color: white; }
 .btn-danger { background-color: var(--danger); color: white; }
+.btn-warning { background-color: var(--warning); color: white; }
 .action-buttons { display: flex; gap: 10px; margin-top: 15px; }
+.menu-buttons { display: flex; flex-direction: column; gap: 10px; max-width: 300px; }
 .btn-small { padding: 5px 10px; font-size: 12px; }
 
 /* Tabel Data */
