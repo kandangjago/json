@@ -7,6 +7,8 @@ let currentActiveJson = null;
 const views = document.querySelectorAll('.view');
 const btnNew = document.getElementById('btn-new');
 const btnExisting = document.getElementById('btn-existing');
+const btnUpload = document.getElementById('btn-upload');
+const fileUpload = document.getElementById('file-upload');
 const btnBacks = document.querySelectorAll('.btn-back');
 
 // Fungsi Utilitas: Perpindahan Tampilan Antarmuka
@@ -16,6 +18,72 @@ function switchView(viewId) {
 }
 
 btnBacks.forEach(btn => btn.addEventListener('click', () => switchView('view-menu')));
+
+// --- SKENARIO 1c: UPLOAD JSON DARI PERANGKAT LOKAL ---
+btnUpload.addEventListener('click', () => {
+    fileUpload.click(); // Memicu input file tersembunyi
+});
+
+fileUpload.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const content = JSON.parse(e.target.result);
+            
+            // Validasi: Pastikan struktur utamanya adalah Array
+            if (!Array.isArray(content)) {
+                alert("Format JSON tidak valid untuk aplikasi ini. Harus berupa Array berisi objek data.");
+                return;
+            }
+
+            // Ekstrak semua nama kolom (keys) secara dinamis
+            let keysSet = new Set();
+            content.forEach(row => {
+                if (typeof row === 'object' && row !== null) {
+                    Object.keys(row).forEach(k => keysSet.add(k));
+                }
+            });
+            const keys = Array.from(keysSet);
+
+            if (keys.length === 0) {
+                alert("File JSON kosong atau tidak memiliki format kolom yang tepat.");
+                return;
+            }
+
+            // Ambil nama file asli (tanpa ekstensi .json) untuk dijadikan nama proyek
+            let rawName = file.name.replace(/\.json$/i, '');
+            let projectName = rawName;
+            
+            // Jika nama sudah ada di memori, tambahkan angka berurut di belakangnya
+            let counter = 1;
+            while(appData[projectName]) {
+                projectName = `${rawName}_${counter}`;
+                counter++;
+            }
+
+            // Simpan file hasil upload ke dalam memori aplikasi
+            appData[projectName] = { keys: keys, data: content };
+            saveToDb();
+
+            alert(`Berhasil membaca file! Data diimpor sebagai proyek: ${projectName}`);
+            
+            // Langsung buka halaman Edit Data
+            currentActiveJson = projectName;
+            loadDataView();
+
+        } catch (err) {
+            alert("Gagal membaca file JSON. Pastikan format file tidak rusak.");
+            console.error(err);
+        } finally {
+            // Reset input file agar pengguna bisa mengunggah file yang sama lagi jika perlu
+            event.target.value = '';
+        }
+    };
+    reader.readAsText(file); // Mulai proses pembacaan file
+});
 
 // --- SKENARIO 2a: BUAT JSON BARU & DEFINISI STRUKTUR ---
 btnNew.addEventListener('click', () => {
@@ -54,7 +122,6 @@ document.getElementById('btn-next').addEventListener('click', () => {
     if (!appData[name]) {
         appData[name] = { keys: keys, data: [] };
     } else {
-        // Pembaruan struktur key jika nama JSON sudah eksis
         appData[name].keys = keys; 
     }
     
@@ -63,7 +130,7 @@ document.getElementById('btn-next').addEventListener('click', () => {
     loadDataView();
 });
 
-// --- SKENARIO 2b & 3: INPUT DATA & UPDATE TABEL ---
+// --- SKENARIO 2b, 3, & UPLOAD: INPUT DATA & UPDATE TABEL ---
 function loadDataView() {
     const project = appData[currentActiveJson];
     document.getElementById('data-title').innerText = `Proyek: ${currentActiveJson}.json`;
@@ -79,7 +146,7 @@ function loadDataView() {
             </div>
         `;
     });
-    formContainer.innerHTML += `<button class="btn-primary" onclick="submitData()">Simpan Data</button>`;
+    formContainer.innerHTML += `<button class="btn-primary" onclick="submitData()">Simpan Data Tambahan</button>`;
 
     renderTable();
     switchView('view-data');
@@ -120,7 +187,8 @@ function renderTable() {
     tbody.innerHTML = '';
     project.data.forEach((row, index) => {
         let tr = document.createElement('tr');
-        let tds = project.keys.map(k => `<td>${row[k]}</td>`).join('');
+        // Gunakan (row[k] || '') untuk menghindari error undefined jika ada kolom yang kosong di data lama
+        let tds = project.keys.map(k => `<td>${row[k] || ''}</td>`).join('');
         tds += `<td><button class="btn-danger btn-small" onclick="deleteData(${index})">Hapus</button></td>`;
         tr.innerHTML = tds;
         tbody.appendChild(tr);
@@ -140,7 +208,7 @@ btnExisting.addEventListener('click', () => {
     
     const projects = Object.keys(appData);
     if (projects.length === 0) {
-        list.innerHTML = '<li>Belum ada data JSON yang dibuat.</li>';
+        list.innerHTML = '<li>Belum ada data JSON yang tersimpan di browser ini.</li>';
     } else {
         projects.forEach(proj => {
             const li = document.createElement('li');
@@ -163,7 +231,7 @@ window.openExisting = function(name) {
 }
 
 window.deleteProject = function(name) {
-    if(confirm(`Konfirmasi penghapusan permanen dari memori browser untuk file: ${name}?`)) {
+    if(confirm(`Konfirmasi penghapusan permanen dari memori browser untuk proyek: ${name}?`)) {
         delete appData[name];
         saveToDb();
         btnExisting.click(); // Refresh list otomatis
