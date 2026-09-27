@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>JSON Generator</h1>
+        
+        <!-- Skenario 1: Menu Utama -->
+        <div id="view-menu" class="view active">
+            <h2>Pilih Skenario:</h2>
+            <button id="btn-new" class="btn-primary">a. Buat JSON Baru</button>
+            <button id="btn-existing" class="btn-secondary">b. Buka JSON yang Ada</button>
+        </div>
+
+        <!-- Skenario 2a: Definisi Struktur JSON Baru -->
+        <div id="view-define" class="view">
+            <h2>Definisi Struktur Data Baru</h2>
+            <div class="form-group">
+                <label>Nama File JSON:</label>
+                <input type="text" id="json-name" placeholder="Contoh: data_karyawan">
+            </div>
+            
+            <label>Kebutuhan Input Data (Kolom):</label>
+            <div id="fields-container"></div>
+            
+            <div class="action-buttons">
+                <button id="btn-add-field" class="btn-secondary">+ Tambah Baris Kolom</button>
+            </div>
+            
+            <hr>
+            <div class="action-buttons">
+                <button class="btn-back btn-danger">Kembali</button>
+                <button id="btn-next" class="btn-primary">Next (Input Data)</button>
+            </div>
+        </div>
+
+        <!-- Skenario 2b & 3: Input & Manajemen Data -->
+        <div id="view-data" class="view">
+            <h2 id="data-title">Input Data</h2>
+            <!-- Indikator jumlah data real-time -->
+            <p id="data-count" style="font-weight: bold; color: var(--primary); margin-top: -10px; margin-bottom: 20px;">Total Data: 0 baris</p>
+            
+            <div class="form-panel" id="data-form-container">
+                <!-- Form input akan di-generate otomatis oleh JavaScript -->
+            </div>
+            
+            <h3>Tabel Data</h3>
+            <div class="table-container">
+                <table id="data-table">
+                    <thead id="data-thead"></thead>
+                    <tbody id="data-tbody"></tbody>
+                </table>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-back btn-danger">Kembali ke Menu Utama</button>
+                <button id="btn-download" class="btn-success">Download File JSON</button>
+            </div>
+        </div>
+
+        <!-- Skenario 3a: Pilih JSON Tersimpan -->
+        <div id="view-list" class="view">
+            <h2>Daftar JSON Tersimpan</h2>
+            <p>Data ini tersimpan di memori browser (Local Storage).</p>
+            <ul id="json-list"></ul>
+            <div class="action-buttons">
+                <button class="btn-back btn-danger">Kembali</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
