@@ -13,8 +13,13 @@
         <!-- Skenario 1: Menu Utama -->
         <div id="view-menu" class="view active">
             <h2>Pilih Skenario:</h2>
-            <button id="btn-new" class="btn-primary">a. Buat JSON Baru</button>
-            <button id="btn-existing" class="btn-secondary">b. Buka JSON yang Ada</button>
+            <div class="menu-buttons">
+                <button id="btn-new" class="btn-primary">a. Buat JSON Baru</button>
+                <button id="btn-existing" class="btn-secondary">b. Buka JSON Tersimpan (Local)</button>
+                <button id="btn-upload" class="btn-warning">c. Upload JSON dari Perangkat</button>
+            </div>
+            <!-- Input file disembunyikan, akan dipanggil melalui tombol c -->
+            <input type="file" id="file-upload" accept=".json" style="display: none;">
         </div>
 
         <!-- Skenario 2a: Definisi Struktur JSON Baru -->
@@ -39,7 +44,7 @@
             </div>
         </div>
 
-        <!-- Skenario 2b & 3: Input & Manajemen Data -->
+        <!-- Skenario 2b, 3, & Upload: Input & Manajemen Data -->
         <div id="view-data" class="view">
             <h2 id="data-title">Input Data</h2>
             <!-- Indikator jumlah data real-time -->
